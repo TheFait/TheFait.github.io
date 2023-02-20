@@ -78,6 +78,20 @@ WL.registerComponent('button', {
     },
 });
 
+WL.registerComponent('lookAt', {
+    target: {type: WL.Type.Object},
+}, {
+    init: function() {
+        console.log('init() with param', this.param);
+    },
+    start: function() {
+        console.log('start() with param', this.param);
+    },
+    update: function(dt) {
+        this.object.lookAt(target.localTransform);
+    },
+});
+
 /**
 Very simple smoke particles system
 */
@@ -92,6 +106,7 @@ WL.registerComponent('particles', {
     maxParticles: {type: WL.Type.Int, default: 64},
     /* Initial speed of emitted particles. */
     initialSpeed: {type: WL.Type.Float, default: 30},
+    applyVelocity: {type: WL.Type.Bool, default: false},
 }, {
     init: function() {
         this.time = 0.0;
@@ -134,27 +149,28 @@ WL.registerComponent('particles', {
         glMatrix.vec3.normalize(viewPos, viewPos);
         const rotation = glMatrix.quat.rotationTo([], [0, 0, 1], viewPos);
 
-        let col = [1, 1, 1, 1];
-
         for(let i = 0; i < this.velocities.length; ++i) {
+            let col = this.materials[i].color;
             const lifeTime = this.time - this.startTime[i];
             let obj = this.objects[i];
             glMatrix.vec3.scale(vel, this.velocities[i], dt);
             obj.getTranslationWorld(origin);
             /* Apply velocity */
-            glMatrix.vec3.add(origin, origin, vel);
+            if (this.applyVelocity){
+                glMatrix.vec3.add(origin, origin, vel);
+            }
 
             obj.resetTransform();
-            const s = 0.25 + 0.25*lifeTime;
+            const s = 0.5 + 0.3*lifeTime;
             obj.scale([s, s, s]);
             obj.rotate(rotation);
             obj.setTranslationLocal(origin);
 
-            this.materials[i].offsetX = 0.1*lifeTime + 100*this.rotationFactor[i];
+            this.materials[i].offsetX = .2*lifeTime + 100*this.rotationFactor[i];
 
             let f = 0.2*lifeTime;
             col[0] = col[1] = col[2] = 1 - f*f;
-            this.materials[i].color = col;
+            //this.materials[i].color = col;
         }
 
         /* drag */
@@ -197,6 +213,7 @@ WL.registerComponent('particles', {
 
 WL.registerComponent('rotate', {
     enabled: {type: WL.Type.Bool, default: true},
+    target: {type: WL.Type.Object},
 }, {
     init: function() {
         console.log('init() with param', this.param);
@@ -212,4 +229,4 @@ WL.registerComponent('rotate', {
     },
 });
 
-//# sourceMappingURL=Vr-bundle.js.map
+//# sourceMappingURL=jallspaceethereal-bundle.js.map
