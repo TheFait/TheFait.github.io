@@ -161,7 +161,7 @@ WL.registerComponent('particles', {
             }
 
             obj.resetTransform();
-            const s = 0.5 + 0.3*lifeTime;
+            const s = 1 + 0.5*lifeTime;
             obj.scale([s, s, s]);
             obj.rotate(rotation);
             obj.setTranslationLocal(origin);
@@ -200,9 +200,9 @@ WL.registerComponent('particles', {
 
         this.startTime[index] = this.time;
         this.rotationFactor[index] = Math.random();
-        this.velocities[index][0] = 2.0*(Math.random() - 0.5);
-        this.velocities[index][1] = Math.random()*3.0 + 3.0;
-        this.velocities[index][2] = 2.0*(Math.random() - 0.5) + 2.0;
+        this.velocities[index][0] = 1.5*(Math.random() - 0.5);
+        //this.velocities[index][1] = Math.random()*3.0 + 3.0;
+        this.velocities[index][2] = 1.5*(Math.random() - 0.5) + 2.0;
 
         glMatrix.vec3.normalize(this.velocities[index], this.velocities[index]);
         glMatrix.vec3.scale(this.velocities[index], this.velocities[index], this.initialSpeed);
