@@ -161,7 +161,7 @@ WL.registerComponent('particles', {
             }
 
             obj.resetTransform();
-            const s = 1 + 0.5*lifeTime;
+            const s = 1 + 2*lifeTime;
             obj.scale([s, s, s]);
             obj.rotate(rotation);
             obj.setTranslationLocal(origin);
