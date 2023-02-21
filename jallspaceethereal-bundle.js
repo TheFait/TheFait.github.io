@@ -161,7 +161,7 @@ WL.registerComponent('particles', {
             }
 
             obj.resetTransform();
-            const s = 1 + 2*lifeTime;
+            const s = 20 + 2*lifeTime;
             obj.scale([s, s, s]);
             obj.rotate(rotation);
             obj.setTranslationLocal(origin);
@@ -197,6 +197,7 @@ WL.registerComponent('particles', {
         }
         obj.transformWorld = this.object.transformWorld;
         obj.scalingLocal.set([0, 0, 0]);
+        //obj.scale([10, 10, 10]);
 
         this.startTime[index] = this.time;
         this.rotationFactor[index] = Math.random();
