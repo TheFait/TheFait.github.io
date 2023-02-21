@@ -112,6 +112,7 @@ WL.registerComponent('particles', {
         this.time = 0.0;
         this.timeSinceSpawn = 0.0;
         this.count = 0;
+        this.firstFrame = true;
     },
     start: function() {
         this.objects = WL.scene.addObjects(this.maxParticles, this.maxParticles);
@@ -129,11 +130,14 @@ WL.registerComponent('particles', {
     update: function(dt) {
         this.time += dt;
         this.timeSinceSpawn += dt;
-        if(this.timeSinceSpawn > this.delay) {
+        if(this.timeSinceSpawn > this.delay || this.firstFrame == true) {
             /* Time to spawn particles */
             const spawnCount = Math.floor(this.timeSinceSpawn / this.delay)
             for(let i = 0; i < spawnCount; ++i) this.spawn();
             this.timeSinceSpawn -= this.delay*spawnCount;
+            if(this.firstFrame){
+                this.firstFrame = false;
+            }
         }
 
         const origin = this.origin;
