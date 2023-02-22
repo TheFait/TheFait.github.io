@@ -21,6 +21,100 @@
  */
 //# sourceMappingURL=editor-components-bundle.js.map
 
+WL.registerComponent('VerticalPatrol', {
+    patrolRadius: {type: WL.Type.Float, default: 1.0},
+    patrolSpeed: {type: WL.Type.Float, default: 1.0},
+}, {
+    init: function() {
+        //console.log('init() with param', this.param);
+    },
+    start: function() {
+        this.origin = [0,0,0];
+        this.object.getTranslationLocal(this.origin);
+        this.destination = this.getRandomPointInSphere(this.patrolRadius);
+        this.direction = this.calcDirection(this.origin, this.destination.position);
+
+        while((glMatrix.vec3.distance(this.destination.position, this.origin) < .1)){
+            console.log('Rerolling');
+            this.destination = this.getRandomPointInSphere(this.patrolRadius);
+        }
+    },
+    update: function(dt) {
+        this.object.getTranslationLocal(this.origin);
+
+        //move towards location
+        this.object.translate([this.direction[0] * dt * this.patrolSpeed,this.direction[1] * dt * this.patrolSpeed,this.direction[2] * dt * this.patrolSpeed]);
+
+        //if our position is really close to destination, find a new point
+        try{
+            while((glMatrix.vec3.distance(this.destination.position, this.origin) < .1)){
+                this.destination = this.getRandomPointInSphere(this.patrolRadius);
+                console.log('getting new position!');
+            }
+        }        
+         finally {
+            this.direction = this.calcDirection(this.origin, this.destination.position);
+        }
+        
+    },
+    calcDirection: function(fromVector, toVector){
+        const direction = new Float32Array(3);
+
+        direction[0] = toVector[0] - fromVector[0];
+        direction[1] = toVector[1] - fromVector[1];
+        direction[2] = toVector[2] - fromVector[2];
+
+        const length = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+
+        direction[0] /= length;
+        direction[1] /= length;
+        direction[2] /= length;
+
+        return direction;
+    },
+    getRandomPointInSphere: function(radius){
+        const currentPosition = new Float32Array(3);
+        const nextPosition = new Float32Array(3);
+        const direction = new Float32Array(3);
+
+        // Generate a random point on the surface of a sphere using spherical coordinates
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+
+        const sinPhi = Math.sin(phi);
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+        const cosPhi = Math.cos(phi);
+
+        currentPosition[0] = radius * sinPhi * cosTheta;
+        currentPosition[1] = radius * sinPhi * sinTheta;
+        currentPosition[2] = radius * cosPhi;
+
+        // Move the point towards the center of the sphere by a random distance
+        const distance = Math.random() * radius;
+        const factor = distance / radius;
+
+        nextPosition[0] = currentPosition[0] * factor;
+        nextPosition[1] = currentPosition[1] * factor;
+        nextPosition[2] = currentPosition[2] * factor;
+
+        direction[0] = nextPosition[0] - currentPosition[0];
+        direction[1] = nextPosition[1] - currentPosition[1];
+        direction[2] = nextPosition[2] - currentPosition[2];
+
+        // Normalize the direction vector
+        const length = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+        direction[0] /= length;
+        direction[1] /= length;
+        direction[2] /= length;
+        
+
+        return { position: [nextPosition[0], nextPosition[1], nextPosition[2]], direction };
+    },
+});
+
 WL.registerComponent('button', {
     buttonMeshObject: {type: WL.Type.Object},
     hoverMaterial: {type: WL.Type.Material},
