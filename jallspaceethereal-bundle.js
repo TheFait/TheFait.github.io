@@ -201,6 +201,7 @@ WL.registerComponent('particles', {
     /* Initial speed of emitted particles. */
     initialSpeed: {type: WL.Type.Float, default: 30},
     applyVelocity: {type: WL.Type.Bool, default: false},
+    singleSpawn: {type: WL.Type.Bool, default: false},
 }, {
     init: function() {
         this.time = 0.0;
@@ -220,19 +221,25 @@ WL.registerComponent('particles', {
         this.origin = [0, 0, 0];
         this.vel = [0, 0, 0];
         this.viewPos = [0, 0, 0];
+
+        this.spawn();
     },
     update: function(dt) {
-        this.time += dt;
-        this.timeSinceSpawn += dt;
-        if(this.timeSinceSpawn > this.delay || this.firstFrame == true) {
-            /* Time to spawn particles */
-            const spawnCount = Math.floor(this.timeSinceSpawn / this.delay)
-            for(let i = 0; i < spawnCount; ++i) this.spawn();
-            this.timeSinceSpawn -= this.delay*spawnCount;
-            if(this.firstFrame){
-                this.firstFrame = false;
+        
+        if(!this.singleSpawn){
+            this.time += dt;
+            this.timeSinceSpawn += dt;
+            if(this.timeSinceSpawn > this.delay || this.firstFrame == true) {
+                /* Time to spawn particles */
+                const spawnCount = Math.floor(this.timeSinceSpawn / this.delay)
+                for(let i = 0; i < spawnCount; ++i) this.spawn();
+                this.timeSinceSpawn -= this.delay*spawnCount;
+                if(this.firstFrame){
+                    this.firstFrame = false;
+                }
             }
         }
+        
 
         const origin = this.origin;
         const vel = this.vel;
